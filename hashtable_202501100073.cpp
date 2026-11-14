@@ -3,16 +3,25 @@
  * Seed S: 73
  * Domain: Cold-drink flavours (PRN mod 3 = 0)
  * Hash Function: Mid-Square Method (PRN is odd)
- * Collision Strategy: Attempted direct array insert (no collision handling) - FAILED APPROACH
+ * Collision Strategy: Separate Chaining (PRN mod 2 = 1)
  * Table Size m: 17
  */
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <iomanip>
 using namespace std;
 
 const int TABLE_SIZE = 17;
+
+// Linked list node for separate chaining
+struct Node {
+    int key;
+    string flavour;
+    Node* next;
+    Node(int k, string f) : key(k), flavour(f), next(nullptr) {}
+};
 
 int midSquareHash(int key) {
     int square = key * key;
@@ -25,47 +34,42 @@ int midSquareHash(int key) {
     return midVal % TABLE_SIZE;
 }
 
-// Simple Array Hash Table without collision handling (FAILED APPROACH)
-class SimpleHashTable {
+// Hash Table using Separate Chaining
+class HashTable {
 private:
-    int table[TABLE_SIZE];
+    vector<Node*> table;
 public:
-    SimpleHashTable() {
-        for (int i = 0; i < TABLE_SIZE; i++) table[i] = -1;
+    HashTable() {
+        table.resize(TABLE_SIZE, nullptr);
     }
 
-    void insert(int key) {
+    void insert(int key, string flavour) {
         int index = midSquareHash(key);
-        // Direct overwrite - loses data on collision!
-        table[index] = key;
-    }
-
-    void display() {
-        cout << "\nFlat Array Hash Table (Overwrites on collision):" << endl;
-        for (int i = 0; i < TABLE_SIZE; i++) {
-            cout << "Index " << setw(2) << i << " : ";
-            if (table[i] == -1) cout << "EMPTY" << endl;
-            else cout << table[i] << endl;
-        }
+        Node* newNode = new Node(key, flavour);
+        // Separate Chaining: Insert at head of linked list
+        newNode->next = table[index];
+        table[index] = newNode;
     }
 };
 
 int main() {
     int S = 73;
     int dataset[20];
-    SimpleHashTable ht;
+    string flavours[20] = {
+        "Cola", "Lemon", "Orange", "Mango", "Grape",
+        "Berry", "Peach", "Soda", "Cherry", "Guava",
+        "Lychee", "Kiwi", "Melon", "Apple", "Pine",
+        "Coconut", "Vanilla", "Rose", "Ginger", "Lime"
+    };
 
-    cout << "============================================" << endl;
-    cout << "PRN: 202501100073" << endl;
-    cout << "Testing naive direct array insert (NO collision handling)" << endl;
-    cout << "============================================\n" << endl;
+    HashTable ht;
 
     for (int i = 0; i < 20; i++) {
         dataset[i] = (S + 13 * i) % 100;
-        ht.insert(dataset[i]);
+        ht.insert(dataset[i], flavours[i]);
     }
 
-    ht.display();
+    cout << "Separate Chaining Hash Table initialized & inserted all 20 keys successfully." << endl;
 
     return 0;
 }
