@@ -3,7 +3,7 @@
  * Seed S: 73
  * Domain: Cold-drink flavours (PRN mod 3 = 0)
  * Hash Function: Mid-Square Method (PRN is odd)
- * Collision Strategy: Separate Chaining (PRN mod 2 = 1)
+ * Collision Strategy: Attempted direct array insert (no collision handling) - FAILED APPROACH
  * Table Size m: 17
  */
 
@@ -14,39 +14,58 @@ using namespace std;
 
 const int TABLE_SIZE = 17;
 
-// Mid-Square Hash Function
 int midSquareHash(int key) {
     int square = key * key;
     string sqStr = to_string(square);
-    
-    // Left-pad with zeros to make it at least 4 digits
     while (sqStr.length() < 4) {
         sqStr = "0" + sqStr;
     }
-    
-    // Extract middle 2 digits (index 1 and 2)
     string mid = sqStr.substr(1, 2);
     int midVal = stoi(mid);
-    
     return midVal % TABLE_SIZE;
 }
+
+// Simple Array Hash Table without collision handling (FAILED APPROACH)
+class SimpleHashTable {
+private:
+    int table[TABLE_SIZE];
+public:
+    SimpleHashTable() {
+        for (int i = 0; i < TABLE_SIZE; i++) table[i] = -1;
+    }
+
+    void insert(int key) {
+        int index = midSquareHash(key);
+        // Direct overwrite - loses data on collision!
+        table[index] = key;
+    }
+
+    void display() {
+        cout << "\nFlat Array Hash Table (Overwrites on collision):" << endl;
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            cout << "Index " << setw(2) << i << " : ";
+            if (table[i] == -1) cout << "EMPTY" << endl;
+            else cout << table[i] << endl;
+        }
+    }
+};
 
 int main() {
     int S = 73;
     int dataset[20];
+    SimpleHashTable ht;
 
     cout << "============================================" << endl;
     cout << "PRN: 202501100073" << endl;
-    cout << "Hash Function: Mid-Square Method (m=17)" << endl;
+    cout << "Testing naive direct array insert (NO collision handling)" << endl;
     cout << "============================================\n" << endl;
 
-    cout << "Dataset & Hash Indices:" << endl;
     for (int i = 0; i < 20; i++) {
         dataset[i] = (S + 13 * i) % 100;
-        int index = midSquareHash(dataset[i]);
-        cout << "Key [" << setw(2) << dataset[i] 
-             << "] -> Hash Index: " << setw(2) << index << endl;
+        ht.insert(dataset[i]);
     }
+
+    ht.display();
 
     return 0;
 }
