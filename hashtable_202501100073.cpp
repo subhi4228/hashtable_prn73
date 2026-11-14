@@ -15,7 +15,6 @@ using namespace std;
 
 const int TABLE_SIZE = 17;
 
-// Linked list node for separate chaining
 struct Node {
     int key;
     string flavour;
@@ -34,7 +33,6 @@ int midSquareHash(int key) {
     return midVal % TABLE_SIZE;
 }
 
-// Hash Table using Separate Chaining
 class HashTable {
 private:
     vector<Node*> table;
@@ -46,9 +44,32 @@ public:
     void insert(int key, string flavour) {
         int index = midSquareHash(key);
         Node* newNode = new Node(key, flavour);
-        // Separate Chaining: Insert at head of linked list
         newNode->next = table[index];
         table[index] = newNode;
+
+        cout << "  Inserted key=" << setw(2) << key
+             << " (" << setw(9) << flavour << ") -> Index "
+             << setw(2) << index << endl;
+    }
+
+    void display() {
+        cout << "\n========== HASH TABLE (Separate Chaining) ==========" << endl;
+        cout << "Table size m = " << TABLE_SIZE << endl;
+        cout << "=====================================================" << endl;
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            cout << "Index " << setw(2) << i << " : ";
+            Node* curr = table[i];
+            if (curr == nullptr) {
+                cout << "NULL";
+            }
+            while (curr != nullptr) {
+                cout << "[" << curr->key << ":" << curr->flavour << "]";
+                if (curr->next != nullptr) cout << " -> ";
+                curr = curr->next;
+            }
+            cout << endl;
+        }
+        cout << "=====================================================" << endl;
     }
 };
 
@@ -62,6 +83,15 @@ int main() {
         "Coconut", "Vanilla", "Rose", "Ginger", "Lime"
     };
 
+    cout << "============================================" << endl;
+    cout << "  PRN       : 202501100073" << endl;
+    cout << "  Domain    : Cold-drink flavours" << endl;
+    cout << "  Hash Func : Mid-Square Method" << endl;
+    cout << "  Collision : Separate Chaining" << endl;
+    cout << "  Table Size: 17" << endl;
+    cout << "============================================\n" << endl;
+
+    cout << "--- Insertion Trace ---" << endl;
     HashTable ht;
 
     for (int i = 0; i < 20; i++) {
@@ -69,7 +99,7 @@ int main() {
         ht.insert(dataset[i], flavours[i]);
     }
 
-    cout << "Separate Chaining Hash Table initialized & inserted all 20 keys successfully." << endl;
+    ht.display();
 
     return 0;
 }
